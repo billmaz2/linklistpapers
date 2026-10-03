@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Link List Maker</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--muted:#6b7385;--accent:#3b5bdb;--border:#d9dde6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161c;--card:#1d2029;--text:#e8eaf0;--muted:#98a0b3;--accent:#8aa2ff;--border:#333847}}
+:root[data-theme="dark"]{--bg:#14161c;--card:#1d2029;--text:#e8eaf0;--muted:#98a0b3;--accent:#8aa2ff;--border:#333847}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+main{max-width:640px;margin:0 auto;padding:24px 16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+label{display:block;font-weight:600;margin:0 0 6px}
+input,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+textarea{min-height:140px;resize:vertical}
+.hint{color:var(--muted);font-size:.85rem;margin:6px 0 14px}
+button{background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:10px 22px;font:inherit;font-weight:600;cursor:pointer}
+h1{margin:0 0 12px}
+ul{margin:0;padding-left:20px}
+li{margin:6px 0}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <label for="title">Title</label>
+    <input id="title" type="text" placeholder="My favorite sites">
+    <div style="height:14px"></div>
+    <label for="lines">Pages</label>
+    <textarea id="lines" placeholder="Google https://google.com&#10;Wikipedia https://wikipedia.org"></textarea>
+    <div class="hint">One page per line: a name and a URL (in any order).</div>
+    <button id="make">Make</button>
+  </div>
+  <div id="out"></div>
+</main>
+<script>
+function toUrl(s){return /^[a-z][a-z0-9+.-]*:\/\//i.test(s)?s:'https://'+s}
+function isUrl(t){return /^[a-z][a-z0-9+.-]*:\/\//i.test(t)||/^(www\.)?[^\s\/]+\.[a-z]{2,}(\/\S*)?$/i.test(t)}
+document.getElementById('make').addEventListener('click',function(){
+  var out=document.getElementById('out');out.innerHTML='';
+  var card=document.createElement('div');card.className='card';
+  var h=document.createElement('h1');h.textContent=document.getElementById('title').value.trim()||'Untitled';
+  card.appendChild(h);
+  var ul=document.createElement('ul');
+  document.getElementById('lines').value.split('\n').forEach(function(line){
+    var parts=line.trim().split(/\s+/).filter(Boolean);if(!parts.length)return;
+    var i=parts.findIndex(isUrl);
+    var url=i>=0?parts[i]:parts[parts.length-1];
+    var name=parts.filter(function(_,k){return k!==(i>=0?i:parts.length-1)}).join(' ')||url;
+    var li=document.createElement('li'),a=document.createElement('a');
+    a.href=toUrl(url);a.target='_blank';a.rel='noopener noreferrer';a.textContent=name;
+    li.appendChild(a);ul.appendChild(li);
+  });
+  card.appendChild(ul);out.appendChild(card);
+});
+</script>
+</body>
+</html>
